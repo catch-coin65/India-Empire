@@ -254,11 +254,6 @@
           <div class="balance-amt" style="color:var(--pink)">₹<span id="dashTotalEarned">0.00</span></div>
           <div class="balance-sub">Lifetime earnings</div>
         </div>
-        <div class="card">
-          <h3>Daily Bonus</h3>
-          <button class="btn-primary" id="claimBonusBtn" style="margin-top:6px;">CLAIM ₹5 BONUS</button>
-          <div class="balance-sub" id="bonusStatus" style="margin-top:8px;"></div>
-        </div>
       </div>
 
       <div class="grid grid-3" style="margin-top:18px;">
@@ -356,7 +351,6 @@
         <button class="admin-tab active" data-admin="offerwalls">Offerwalls</button>
         <button class="admin-tab" data-admin="users">Users</button>
         <button class="admin-tab" data-admin="withdrawals">Withdrawals</button>
-        <button class="admin-tab" data-admin="bonus">Daily Bonus</button>
         <button class="admin-tab" data-admin="promocodes">Promo Codes</button>
         <button class="admin-tab" data-admin="referrals">Referrals</button>
       </div>
@@ -403,16 +397,6 @@
           <table>
             <thead><tr><th>Email</th><th>Amount</th><th>UPI</th><th>Status</th><th>Action</th></tr></thead>
             <tbody id="withdrawalsAdminBody"><tr><td colspan="5" class="empty-note">No withdrawal requests.</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- DAILY BONUS -->
-      <div class="admin-sec" id="admin-bonus">
-        <div class="card table-wrap">
-          <table>
-            <thead><tr><th>Email</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody id="bonusAdminBody"><tr><td colspan="4" class="empty-note">No bonus requests.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -479,7 +463,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const ADMIN_EMAIL = "sa5332227@gmail.com";
-const DAILY_BONUS_AMOUNT = 5;
 const REFERRAL_BONUS_AMOUNT = 10;
 const MIN_WITHDRAWAL = 50;
 
@@ -759,58 +742,12 @@ function initDashboard(){
   });
   unsubscribers.push(unsubOffers);
 
-  // Daily bonus - check last claim
-  refreshBonusButton();
-
   // Referral count
   const unsubRefs = db.collection('referrals').where('referrerUid','==',uid).onSnapshot(snap=>{
     document.getElementById('refCount').textContent = snap.size;
   });
   unsubscribers.push(unsubRefs);
 }
-
-async function refreshBonusButton(){
-  const uid = currentUser.uid;
-  const btn = document.getElementById('claimBonusBtn');
-  const statusEl = document.getElementById('bonusStatus');
-  try{
-    const snap = await db.collection('dailyBonus').where('uid','==',uid).get();
-    let lastTime = 0;
-    snap.forEach(doc=>{
-      const t = doc.data().timestamp;
-      const ms = t && t.toMillis ? t.toMillis() : 0;
-      if(ms > lastTime) lastTime = ms;
-    });
-    const hoursSince = (Date.now() - lastTime) / (1000*60*60);
-    if(lastTime && hoursSince < 24){
-      btn.disabled = true;
-      const remain = Math.ceil(24 - hoursSince);
-      statusEl.textContent = `Already claimed. Try again in ~${remain}h.`;
-    }else{
-      btn.disabled = false;
-      statusEl.textContent = 'Claim your free daily bonus!';
-    }
-  }catch(err){ console.error(err); }
-}
-
-document.getElementById('claimBonusBtn').onclick = async ()=>{
-  const btn = document.getElementById('claimBonusBtn');
-  btn.disabled = true;
-  try{
-    await db.collection('dailyBonus').add({
-      uid: currentUser.uid,
-      email: currentUserData.email,
-      amount: DAILY_BONUS_AMOUNT,
-      status: 'Pending',
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    toast('Bonus request submitted! Admin will review shortly.', 'success');
-    refreshBonusButton();
-  }catch(err){
-    toast('Failed to claim bonus: ' + err.message, 'error');
-    btn.disabled = false;
-  }
-};
 
 document.getElementById('copyRefBtn').onclick = ()=>{
   const input = document.getElementById('refLink');
@@ -957,7 +894,6 @@ function initAdminPanel(){
   loadAdminOfferwalls();
   loadAdminUsers();
   loadAdminWithdrawals();
-  loadAdminBonus();
   loadAdminPromoCodes();
   loadAdminPromoRedemptions();
   loadAdminReferrals();
@@ -1090,47 +1026,6 @@ window.approveWithdrawal = async (id, uid, amount)=>{
 window.rejectWithdrawal = async (id)=>{
   await db.collection('withdrawals').doc(id).update({ status: 'Rejected' });
   toast('Withdrawal rejected.', 'success');
-};
-
-// -- Daily Bonus --
-function loadAdminBonus(){
-  const unsub = db.collection('dailyBonus').onSnapshot(snap=>{
-    const body = document.getElementById('bonusAdminBody');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-note">No bonus requests.</td></tr>'; return; }
-    let rows = [];
-    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
-    rows.sort((a,b)=> statusOrder(a.status)-statusOrder(b.status));
-    body.innerHTML = rows.map(b=>`
-      <tr>
-        <td>${escapeHtml(b.email)}</td>
-        <td>₹${fmtMoney(b.amount)}</td>
-        <td><span class="badge ${b.status.toLowerCase()}">${b.status}</span></td>
-        <td>
-          ${b.status === 'Pending' ? `
-            <button class="mini-btn btn-good" onclick="approveBonus('${b.id}','${b.uid}',${b.amount})">Approve</button>
-            <button class="mini-btn btn-danger" onclick="rejectBonus('${b.id}')">Reject</button>
-          ` : '-'}
-        </td>
-      </tr>
-    `).join('');
-  });
-  unsubscribers.push(unsub);
-}
-window.approveBonus = async (id, uid, amount)=>{
-  try{
-    await db.runTransaction(async (tx)=>{
-      const userRef = db.collection('users').doc(uid);
-      const userSnap = await tx.get(userRef);
-      const d = userSnap.data();
-      tx.update(userRef, { balance: (d.balance||0) + amount, totalEarned: (d.totalEarned||0) + amount });
-      tx.update(db.collection('dailyBonus').doc(id), { status: 'Approved' });
-    });
-    toast('Bonus approved & credited.', 'success');
-  }catch(err){ toast('Error: ' + err.message, 'error'); }
-};
-window.rejectBonus = async (id)=>{
-  await db.collection('dailyBonus').doc(id).update({ status: 'Rejected' });
-  toast('Bonus request rejected.', 'success');
 };
 
 // -- Promo Codes --
