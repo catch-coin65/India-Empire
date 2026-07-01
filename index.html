@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>India Empire — Earn & Reward</title>
+<meta name="description" content="India Empire — complete offers, refer friends, and withdraw your earnings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070a13;
+    --bg2:#0c1122;
+    --card:#0f152a;
+    --card2:#121933;
+    --border:rgba(0,245,255,.16);
+    --cyan:#00f5ff;
+    --pink:#ff2ea6;
+    --text:#e7edf7;
+    --muted:#8592ad;
+    --good:#26e08a;
+    --bad:#ff4d6d;
+    --warn:#ffb648;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(circle at 20% 0%, #0d1a33 0%, var(--bg) 55%) fixed;
+    color:var(--text);
+    font-family:'Poppins',sans-serif;
+    min-height:100vh;
+  }
+  h1,h2,h3,.brand,.logo{font-family:'Orbitron',sans-serif;}
+  a{color:var(--cyan);text-decoration:none;}
+  .hidden{display:none !important;}
+  button{cursor:pointer;font-family:'Poppins',sans-serif;}
+  input,select{font-family:'Poppins',sans-serif;}
+
+  /* Loading */
+  #loadingScreen{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:var(--bg);z-index:999;flex-direction:column;gap:14px;
+  }
+  .spinner{width:46px;height:46px;border-radius:50%;border:3px solid rgba(0,245,255,.15);
+    border-top-color:var(--cyan);animation:spin 0.9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #loadingScreen span{color:var(--muted);font-size:13px;letter-spacing:1px;}
+
+  /* Toast */
+  #toast{
+    position:fixed;top:18px;right:18px;z-index:1000;display:flex;flex-direction:column;gap:10px;
+    max-width:340px;
+  }
+  .toast-item{
+    padding:14px 16px;border-radius:10px;background:var(--card2);
+    border:1px solid var(--border);font-size:14px;line-height:1.4;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slideIn .25s ease;
+  }
+  .toast-item.success{border-color:rgba(38,224,138,.4);color:#c9ffe6;}
+  .toast-item.error{border-color:rgba(255,77,109,.4);color:#ffd6dd;}
+  .toast-item.info{border-color:rgba(0,245,255,.35);}
+  @keyframes slideIn{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+  /* Auth view */
+  #authView{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  .auth-card{
+    width:100%;max-width:400px;background:var(--card);border:1px solid var(--border);
+    border-radius:18px;padding:32px 28px;box-shadow:0 0 40px rgba(0,245,255,.06), 0 20px 60px rgba(0,0,0,.5);
+    position:relative;overflow:hidden;
+  }
+  .auth-card::before{
+    content:"";position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;
+    background:radial-gradient(circle, rgba(255,46,166,.18), transparent 70%);
+  }
+  .brand{
+    font-size:22px;font-weight:900;letter-spacing:2px;text-align:center;margin-bottom:4px;
+    background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;
+    background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .tagline{text-align:center;color:var(--muted);font-size:12px;margin-bottom:24px;letter-spacing:1px;}
+  .tabs{display:flex;gap:8px;background:var(--bg2);border-radius:12px;padding:5px;margin-bottom:22px;}
+  .tab{
+    flex:1;padding:10px;border:none;border-radius:9px;background:transparent;color:var(--muted);
+    font-weight:600;font-size:14px;transition:.2s;
+  }
+  .tab.active{background:linear-gradient(90deg,rgba(0,245,255,.15),rgba(255,46,166,.15));color:var(--text);
+    box-shadow:inset 0 0 0 1px var(--border);}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px;}
+  .field input{
+    width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);
+    background:var(--bg2);color:var(--text);font-size:14px;outline:none;transition:.2s;
+  }
+  .field input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,245,255,.1);}
+  .btn-primary{
+    width:100%;padding:13px;border:none;border-radius:10px;font-weight:700;font-size:14px;
+    letter-spacing:.5px;color:#04121a;background:linear-gradient(90deg,var(--cyan),#00c2ff);
+    box-shadow:0 6px 20px rgba(0,245,255,.25);transition:.2s;margin-top:4px;
+  }
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-ghost{
+    padding:10px 16px;border-radius:9px;border:1px solid var(--border);background:transparent;
+    color:var(--text);font-size:13px;font-weight:600;
+  }
+  .btn-danger{background:linear-gradient(90deg,#ff4d6d,#ff2e6d);color:#1a0407;}
+  .btn-good{background:linear-gradient(90deg,#26e08a,#12c46b);color:#04170c;}
+  .auth-error{
+    background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);color:#ffb9c5;
+    padding:10px 12px;border-radius:8px;font-size:12.5px;margin-bottom:14px;display:none;
+  }
+
+  /* App shell */
+  #mainNav{
+    display:flex;align-items:center;justify-content:space-between;padding:16px 24px;
+    background:rgba(10,14,26,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:50;flex-wrap:wrap;gap:10px;
+  }
+  .logo{font-size:17px;font-weight:900;letter-spacing:2px;
+    background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;
+    background-clip:text;-webkit-text-fill-color:transparent;}
+  .navLinks{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .navLinks button{
+    padding:9px 16px;border-radius:9px;border:1px solid var(--border);background:var(--card2);
+    color:var(--text);font-size:13px;font-weight:600;transition:.2s;
+  }
+  .navLinks button.active{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 12px rgba(0,245,255,.15);}
+  .navLinks button:hover{border-color:var(--cyan);}
+
+  .container{max-width:1000px;margin:0 auto;padding:28px 20px 60px;}
+  .grid{display:grid;gap:18px;}
+  .grid-2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+  .grid-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;
+  }
+  .card h3{margin:0 0 14px;font-size:14px;color:var(--muted);letter-spacing:1px;font-weight:600;text-transform:uppercase;}
+  .balance-amt{font-size:38px;font-weight:900;font-family:'Orbitron',sans-serif;color:var(--cyan);
+    text-shadow:0 0 20px rgba(0,245,255,.3);}
+  .balance-sub{color:var(--muted);font-size:12.5px;margin-top:4px;}
+  .section-title{font-size:20px;font-weight:700;margin:34px 0 16px;letter-spacing:.5px;}
+  .section-title:first-child{margin-top:0;}
+
+  .offer-card{
+    background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:18px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .offer-name{font-weight:700;font-size:15px;}
+  .offer-go{
+    padding:10px;border-radius:9px;border:none;font-weight:700;font-size:13px;
+    background:linear-gradient(90deg,var(--pink),#ff5fc0);color:#1a0410;
+  }
+  .empty-note{color:var(--muted);font-size:13px;padding:20px;text-align:center;border:1px dashed var(--border);border-radius:12px;}
+
+  .row-input{display:flex;gap:10px;flex-wrap:wrap;}
+  .row-input input{flex:1;min-width:140px;padding:11px 12px;border-radius:9px;border:1px solid var(--border);
+    background:var(--bg2);color:var(--text);font-size:13.5px;}
+  .row-input button{padding:11px 18px;border-radius:9px;border:none;font-weight:700;font-size:13px;
+    background:linear-gradient(90deg,var(--cyan),#00c2ff);color:#04121a;white-space:nowrap;}
+
+  .ref-code-box{
+    display:flex;align-items:center;justify-content:space-between;background:var(--bg2);
+    border:1px dashed var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;
+  }
+  .ref-code-box code{font-size:16px;font-weight:700;color:var(--pink);letter-spacing:2px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--border);}
+  th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;}
+  .badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;}
+  .badge.pending{background:rgba(255,182,72,.15);color:var(--warn);}
+  .badge.paid,.badge.approved,.badge.active{background:rgba(38,224,138,.15);color:var(--good);}
+  .badge.rejected,.badge.disabled,.badge.blocked{background:rgba(255,77,109,.15);color:var(--bad);}
+  .table-wrap{overflow-x:auto;}
+  .mini-input{width:80px;padding:7px 8px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12.5px;}
+  .mini-btn{padding:7px 10px;border-radius:7px;border:none;font-size:11.5px;font-weight:700;margin-right:4px;margin-top:4px;}
+
+  .admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+  .admin-tab{padding:9px 15px;border-radius:9px;border:1px solid var(--border);background:var(--card2);
+    color:var(--muted);font-size:12.5px;font-weight:600;}
+  .admin-tab.active{color:var(--cyan);border-color:var(--cyan);}
+  .admin-sec{display:none;}
+  .admin-sec.active{display:block;}
+
+  footer{text-align:center;color:var(--muted);font-size:11.5px;padding:30px 20px;}
+  @media(max-width:600px){
+    .balance-amt{font-size:30px;}
+    #mainNav{padding:12px 14px;}
+    .container{padding:20px 14px 50px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="loadingScreen"><div class="spinner"></div><span>LOADING INDIA EMPIRE...</span></div>
+<div id="toast"></div>
+
+<!-- AUTH VIEW -->
+<div id="authView" class="view hidden">
+  <div class="auth-card">
+    <div class="brand">INDIA EMPIRE</div>
+    <div class="tagline">EARN • REFER • WITHDRAW</div>
+    <div class="tabs">
+      <button class="tab active" id="tabLogin">Login</button>
+      <button class="tab" id="tabSignup">Signup</button>
+    </div>
+
+    <div class="auth-error" id="authError"></div>
+
+    <form id="loginForm">
+      <div class="field"><label>EMAIL</label><input type="email" id="loginEmail" required></div>
+      <div class="field"><label>PASSWORD</label><input type="password" id="loginPassword" required></div>
+      <button type="submit" class="btn-primary" id="loginBtn">LOGIN</button>
+    </form>
+
+    <form id="signupForm" class="hidden">
+      <div class="field"><label>FULL NAME</label><input type="text" id="signupName" required></div>
+      <div class="field"><label>EMAIL</label><input type="email" id="signupEmail" required></div>
+      <div class="field"><label>PASSWORD (min 6 characters)</label><input type="password" id="signupPassword" minlength="6" required></div>
+      <div class="field"><label>REFERRAL CODE (optional)</label><input type="text" id="signupReferral"></div>
+      <button type="submit" class="btn-primary" id="signupBtn">CREATE ACCOUNT</button>
+    </form>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell" class="hidden">
+  <nav id="mainNav">
+    <div class="logo">INDIA EMPIRE</div>
+    <div class="navLinks" id="userNavLinks">
+      <button data-view="dashboard" class="active">Dashboard</button>
+      <button data-view="payments">Payments</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+    <div class="navLinks hidden" id="adminNavLinks">
+      <span style="color:var(--muted);font-size:12.5px;">Admin: <b id="adminEmailTag" style="color:var(--cyan)"></b></span>
+      <button id="logoutBtnAdmin">Logout</button>
+    </div>
+  </nav>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="dashboardView" class="view hidden">
+    <div class="container">
+      <div class="grid grid-3">
+        <div class="card">
+          <h3>Your Balance</h3>
+          <div class="balance-amt">₹<span id="dashBalance">0.00</span></div>
+          <div class="balance-sub" id="dashStatus"></div>
+        </div>
+        <div class="card">
+          <h3>Total Earned</h3>
+          <div class="balance-amt" style="color:var(--pink)">₹<span id="dashTotalEarned">0.00</span></div>
+          <div class="balance-sub">Lifetime earnings</div>
+        </div>
+        <div class="card">
+          <h3>Daily Bonus</h3>
+          <button class="btn-primary" id="claimBonusBtn" style="margin-top:6px;">CLAIM ₹5 BONUS</button>
+          <div class="balance-sub" id="bonusStatus" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="margin-top:18px;">
+        <div class="card" style="text-align:center;">
+          <h3>Total Members</h3>
+          <div class="balance-amt" style="font-size:28px;color:var(--text)"><span id="statMembers">0</span></div>
+        </div>
+        <div class="card" style="text-align:center;">
+          <h3>Paid Withdrawals</h3>
+          <div class="balance-amt" style="font-size:28px;color:var(--good)"><span id="statPaid">0</span></div>
+        </div>
+        <div class="card" style="text-align:center;">
+          <h3>Active Offers</h3>
+          <div class="balance-amt" style="font-size:28px;color:var(--pink)"><span id="statOffers">0</span></div>
+        </div>
+      </div>
+
+      <div class="section-title">🎯 Available Offerwalls</div>
+      <div class="grid grid-3" id="offerwallGrid">
+        <div class="empty-note">Loading offers...</div>
+      </div>
+
+      <div class="section-title">👥 Refer & Earn</div>
+      <div class="card">
+        <div class="ref-code-box">
+          <span>Your Referral Code</span>
+          <code id="refCode">-</code>
+        </div>
+        <div class="row-input">
+          <input type="text" id="refLink" readonly>
+          <button id="copyRefBtn">COPY LINK</button>
+        </div>
+        <div class="balance-sub" style="margin-top:10px;">Referred friends: <b id="refCount" style="color:var(--cyan)">0</b> · Earn ₹10 per successful referral (approved by admin)</div>
+      </div>
+
+      <div class="section-title">🎁 Redeem Promo Code</div>
+      <div class="card">
+        <div class="row-input">
+          <input type="text" id="promoInput" placeholder="Enter promo code e.g. INDIA50">
+          <button id="redeemPromoBtn">REDEEM</button>
+        </div>
+        <div class="balance-sub" id="promoNote" style="margin-top:8px;">Approved codes credit your balance after admin review.</div>
+      </div>
+
+      <div class="section-title">👤 My Profile</div>
+      <div class="card" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+        <div id="profAvatar" style="width:64px;height:64px;border-radius:50%;flex-shrink:0;
+          background:linear-gradient(135deg,var(--cyan),var(--pink));display:flex;align-items:center;
+          justify-content:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;color:#04121a;">A</div>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:18px;font-weight:700;" id="profName">-</div>
+          <div style="color:var(--muted);font-size:13px;" id="profEmail">-</div>
+        </div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap;">
+          <div><div style="color:var(--muted);font-size:11px;letter-spacing:.5px;">JOINED</div><div style="font-weight:600;font-size:13px;" id="profJoined">-</div></div>
+          <div><div style="color:var(--muted);font-size:11px;letter-spacing:.5px;">STATUS</div><div style="font-weight:600;font-size:13px;" id="profStatus">-</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENTS VIEW -->
+  <div id="paymentsView" class="view hidden">
+    <div class="container">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Available Balance</h3>
+          <div class="balance-amt">₹<span id="payAvailBalance">0.00</span></div>
+          <div class="balance-sub" id="payPendingNote"></div>
+        </div>
+        <div class="card">
+          <h3>Withdraw Funds</h3>
+          <form id="withdrawForm">
+            <div class="field"><label>AMOUNT (min ₹50)</label><input type="number" id="withdrawAmount" min="50" step="1" required></div>
+            <div class="field"><label>UPI ID / PAYMENT DETAILS</label><input type="text" id="withdrawUpi" required placeholder="yourname@upi"></div>
+            <button type="submit" class="btn-primary" id="withdrawBtn">REQUEST WITHDRAWAL</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="section-title">📜 Payout History</div>
+      <div class="card table-wrap">
+        <table>
+          <thead><tr><th>Amount</th><th>UPI</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="payoutHistoryBody"><tr><td colspan="4" class="empty-note">No withdrawal requests yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN VIEW -->
+  <div id="adminView" class="view hidden">
+    <div class="container">
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-admin="offerwalls">Offerwalls</button>
+        <button class="admin-tab" data-admin="users">Users</button>
+        <button class="admin-tab" data-admin="withdrawals">Withdrawals</button>
+        <button class="admin-tab" data-admin="bonus">Daily Bonus</button>
+        <button class="admin-tab" data-admin="promocodes">Promo Codes</button>
+        <button class="admin-tab" data-admin="referrals">Referrals</button>
+      </div>
+
+      <!-- OFFERWALLS -->
+      <div class="admin-sec active" id="admin-offerwalls">
+        <div class="card" style="margin-bottom:20px;">
+          <h3>Add New Offerwall</h3>
+          <form id="offerwallForm">
+            <div class="grid grid-3">
+              <div class="field"><label>OFFERWALL NAME</label><input type="text" id="owName" required></div>
+              <div class="field"><label>URL</label><input type="url" id="owUrl" required placeholder="https://..."></div>
+              <div class="field"><label>STATUS</label>
+                <select id="owStatus" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);">
+                  <option value="Active">Active</option>
+                  <option value="Disabled">Disabled</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:auto;padding:12px 24px;">ADD OFFERWALL</button>
+          </form>
+        </div>
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>URL</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="offerwallAdminBody"><tr><td colspan="4" class="empty-note">No offerwalls yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="admin-sec" id="admin-users">
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Status</th><th>Set Balance</th><th>Block</th></tr></thead>
+            <tbody id="usersAdminBody"><tr><td colspan="6" class="empty-note">Loading users...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- WITHDRAWALS -->
+      <div class="admin-sec" id="admin-withdrawals">
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Email</th><th>Amount</th><th>UPI</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="withdrawalsAdminBody"><tr><td colspan="5" class="empty-note">No withdrawal requests.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DAILY BONUS -->
+      <div class="admin-sec" id="admin-bonus">
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Email</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="bonusAdminBody"><tr><td colspan="4" class="empty-note">No bonus requests.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PROMO CODES -->
+      <div class="admin-sec" id="admin-promocodes">
+        <div class="card" style="margin-bottom:20px;">
+          <h3>Create Promo Code</h3>
+          <form id="promoCodeForm">
+            <div class="grid grid-3">
+              <div class="field"><label>CODE</label><input type="text" id="promoCodeInput" required placeholder="INDIA50" style="text-transform:uppercase;"></div>
+              <div class="field"><label>AMOUNT (₹)</label><input type="number" id="promoAmountInput" required min="1"></div>
+              <div class="field"><label>&nbsp;</label><button type="submit" class="btn-primary">CREATE CODE</button></div>
+            </div>
+          </form>
+        </div>
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Code</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="promoCodesAdminBody"><tr><td colspan="4" class="empty-note">No promo codes yet.</td></tr></tbody>
+          </table>
+        </div>
+        <div class="section-title">Redemption Requests</div>
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Email</th><th>Code</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="promoRedeemAdminBody"><tr><td colspan="5" class="empty-note">No redemption requests.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REFERRALS -->
+      <div class="admin-sec" id="admin-referrals">
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Referrer</th><th>New User</th><th>Bonus</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="referralsAdminBody"><tr><td colspan="5" class="empty-note">No referral requests.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>© <span id="yearTag"></span> India Empire · <a href="#" id="privacyLink">Privacy Policy</a> · <a href="#" id="termsLink">Terms of Service</a></footer>
+</div>
+
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+/* ============ CONFIG ============ */
+const firebaseConfig = {
+  apiKey: "AIzaSyAu6-2dVHJEc8kaFUxhkhV4Y8EQmbBCSIc",
+  authDomain: "india-d7624.firebaseapp.com",
+  projectId: "india-d7624",
+  storageBucket: "india-d7624.firebasestorage.app",
+  messagingSenderId: "882065653508",
+  appId: "1:882065653508:web:103a29efb8dc15aa5a1a51"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const ADMIN_EMAIL = "sa5332227@gmail.com";
+const DAILY_BONUS_AMOUNT = 5;
+const REFERRAL_BONUS_AMOUNT = 10;
+const MIN_WITHDRAWAL = 50;
+
+let currentUser = null;
+let currentUserData = null;
+let unsubscribers = [];
+
+document.getElementById('yearTag').textContent = new Date().getFullYear();
+
+/* ============ UTIL ============ */
+function toast(msg, type='info'){
+  const box = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = 'toast-item ' + type;
+  el.textContent = msg;
+  box.appendChild(el);
+  setTimeout(()=>{ el.remove(); }, 4500);
+}
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+function fmtMoney(n){ return Number(n||0).toFixed(2); }
+function fmtDate(ts){
+  if(!ts) return '-';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) + ' ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+function genReferralCode(uid){
+  return (uid.substring(0,6) + Math.random().toString(36).substring(2,4)).toUpperCase();
+}
+function clearListeners(){
+  unsubscribers.forEach(u=>{ try{ u(); }catch(e){} });
+  unsubscribers = [];
+}
+
+/* ============ AUTH TABS ============ */
+document.getElementById('tabLogin').onclick = ()=>{
+  document.getElementById('tabLogin').classList.add('active');
+  document.getElementById('tabSignup').classList.remove('active');
+  document.getElementById('loginForm').classList.remove('hidden');
+  document.getElementById('signupForm').classList.add('hidden');
+  document.getElementById('authError').style.display='none';
+};
+document.getElementById('tabSignup').onclick = ()=>{
+  document.getElementById('tabSignup').classList.add('active');
+  document.getElementById('tabLogin').classList.remove('active');
+  document.getElementById('signupForm').classList.remove('hidden');
+  document.getElementById('loginForm').classList.add('hidden');
+  document.getElementById('authError').style.display='none';
+};
+
+// Prefill referral code from URL ?ref=CODE
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if(ref){
+    document.getElementById('signupReferral').value = ref.toUpperCase();
+    document.getElementById('tabSignup').click();
+  }
+})();
+
+function showAuthError(msg){
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+/* ============ SIGNUP ============ */
+document.getElementById('signupForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('signupBtn');
+  btn.disabled = true; btn.textContent = 'CREATING...';
+  document.getElementById('authError').style.display='none';
+
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const referralInput = document.getElementById('signupReferral').value.trim().toUpperCase();
+
+  try{
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    const uid = cred.user.uid;
+    const role = (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ? 'admin' : 'user';
+    const referralCode = genReferralCode(uid);
+
+    let referredByCode = null;
+    let referrerDoc = null;
+    if(referralInput && role !== 'admin'){
+      const q = await db.collection('users').where('referralCode','==',referralInput).limit(1).get();
+      if(!q.empty){
+        referrerDoc = q.docs[0];
+        referredByCode = referralInput;
+      }
+    }
+
+    await db.collection('users').doc(uid).set({
+      name: name,
+      email: email,
+      balance: 0,
+      role: role,
+      status: 'active',
+      referralCode: referralCode,
+      referredBy: referredByCode,
+      totalEarned: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    if(referrerDoc){
+      await db.collection('referrals').add({
+        referrerUid: referrerDoc.id,
+        referrerEmail: referrerDoc.data().email,
+        newUserUid: uid,
+        newUserEmail: email,
+        bonusAmount: REFERRAL_BONUS_AMOUNT,
+        status: 'Pending',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    toast('Account created! Welcome to India Empire.', 'success');
+    // onAuthStateChanged will handle routing
+  }catch(err){
+    btn.disabled = false; btn.textContent = 'CREATE ACCOUNT';
+    showAuthError(friendlyAuthError(err));
+  }
+});
+
+/* ============ LOGIN ============ */
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'LOGGING IN...';
+  document.getElementById('authError').style.display='none';
+
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  try{
+    await auth.signInWithEmailAndPassword(email, password);
+    // onAuthStateChanged handles routing
+  }catch(err){
+    btn.disabled = false; btn.textContent = 'LOGIN';
+    showAuthError(friendlyAuthError(err));
+  }
+});
+
+function friendlyAuthError(err){
+  const code = err.code || '';
+  if(code.includes('wrong-password') || code.includes('invalid-credential')) return 'Wrong password. Please try again.';
+  if(code.includes('user-not-found')) return 'No account found with this email.';
+  if(code.includes('email-already-in-use')) return 'This email is already registered. Please login instead.';
+  if(code.includes('invalid-email')) return 'Please enter a valid email address.';
+  if(code.includes('weak-password')) return 'Password must be at least 6 characters.';
+  if(code.includes('too-many-requests')) return 'Too many attempts. Please try again later.';
+  return err.message || 'Something went wrong. Please try again.';
+}
+
+/* ============ LOGOUT ============ */
+function doLogout(){
+  clearListeners();
+  auth.signOut();
+}
+document.getElementById('logoutBtn').onclick = doLogout;
+document.getElementById('logoutBtnAdmin').onclick = doLogout;
+
+/* ============ NAV SWITCHING ============ */
+document.querySelectorAll('#userNavLinks button[data-view]').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('#userNavLinks button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    showView(btn.dataset.view + 'View');
+    if(btn.dataset.view === 'payments') loadPaymentsView();
+  };
+});
+
+/* ============ AUTH STATE ============ */
+auth.onAuthStateChanged(async (user)=>{
+  document.getElementById('loadingScreen').classList.add('hidden');
+  clearListeners();
+
+  if(!user){
+    currentUser = null; currentUserData = null;
+    document.getElementById('appShell').classList.add('hidden');
+    showView('authView');
+    return;
+  }
+
+  currentUser = user;
+  try{
+    const docSnap = await db.collection('users').doc(user.uid).get();
+    if(!docSnap.exists){
+      toast('Account data not found. Signing out.', 'error');
+      auth.signOut();
+      return;
+    }
+    currentUserData = docSnap.data();
+
+    if(currentUserData.status === 'blocked'){
+      toast('Your account has been blocked. Contact support.', 'error');
+      auth.signOut();
+      return;
+    }
+
+    document.getElementById('authView').classList.add('hidden');
+    document.getElementById('appShell').classList.remove('hidden');
+
+    if(currentUserData.role === 'admin'){
+      document.getElementById('userNavLinks').classList.add('hidden');
+      document.getElementById('adminNavLinks').classList.remove('hidden');
+      document.getElementById('adminEmailTag').textContent = currentUserData.email;
+      showView('adminView');
+      initAdminPanel();
+    }else{
+      document.getElementById('adminNavLinks').classList.add('hidden');
+      document.getElementById('userNavLinks').classList.remove('hidden');
+      showView('dashboardView');
+      initDashboard();
+    }
+  }catch(err){
+    console.error(err);
+    toast('Error loading your account. Please refresh.', 'error');
+  }
+});
+
+/* ============ DASHBOARD ============ */
+function initDashboard(){
+  const uid = currentUser.uid;
+
+  // Real-time balance / profile
+  const unsubUser = db.collection('users').doc(uid).onSnapshot(snap=>{
+    if(!snap.exists) return;
+    const d = snap.data();
+    currentUserData = d;
+    document.getElementById('dashBalance').textContent = fmtMoney(d.balance);
+    document.getElementById('dashTotalEarned').textContent = fmtMoney(d.totalEarned);
+    document.getElementById('dashStatus').textContent = 'Account: ' + (d.status || 'active');
+    document.getElementById('refCode').textContent = d.referralCode || '-';
+    document.getElementById('refLink').value = window.location.origin + window.location.pathname + '?ref=' + (d.referralCode||'');
+    document.getElementById('profName').textContent = d.name || '-';
+    document.getElementById('profEmail').textContent = d.email || '-';
+    document.getElementById('profJoined').textContent = fmtDate(d.createdAt);
+    document.getElementById('profStatus').textContent = d.status || '-';
+    document.getElementById('profAvatar').textContent = (d.name || '?').trim().charAt(0).toUpperCase();
+  });
+  unsubscribers.push(unsubUser);
+
+  // Live stats: total members
+  const unsubMembers = db.collection('users').onSnapshot(snap=>{
+    document.getElementById('statMembers').textContent = snap.size;
+  });
+  unsubscribers.push(unsubMembers);
+
+  // Live stats: paid withdrawals count
+  const unsubPaid = db.collection('withdrawals').where('status','==','Paid').onSnapshot(snap=>{
+    document.getElementById('statPaid').textContent = snap.size;
+  });
+  unsubscribers.push(unsubPaid);
+
+  // Offerwalls
+  const unsubOffers = db.collection('offerwalls').where('status','==','Active').onSnapshot(snap=>{
+    document.getElementById('statOffers').textContent = snap.size;
+    const grid = document.getElementById('offerwallGrid');
+    if(snap.empty){
+      grid.innerHTML = '<div class="empty-note">No active offers right now. Check back soon!</div>';
+      return;
+    }
+    grid.innerHTML = '';
+    snap.forEach(doc=>{
+      const o = doc.data();
+      const card = document.createElement('div');
+      card.className = 'offer-card';
+      card.innerHTML = `<div class="offer-name">${escapeHtml(o.name)}</div><button class="offer-go">START OFFER →</button>`;
+      card.querySelector('.offer-go').onclick = ()=> window.open(o.url, '_blank');
+      grid.appendChild(card);
+    });
+  });
+  unsubscribers.push(unsubOffers);
+
+  // Daily bonus - check last claim
+  refreshBonusButton();
+
+  // Referral count
+  const unsubRefs = db.collection('referrals').where('referrerUid','==',uid).onSnapshot(snap=>{
+    document.getElementById('refCount').textContent = snap.size;
+  });
+  unsubscribers.push(unsubRefs);
+}
+
+async function refreshBonusButton(){
+  const uid = currentUser.uid;
+  const btn = document.getElementById('claimBonusBtn');
+  const statusEl = document.getElementById('bonusStatus');
+  try{
+    const snap = await db.collection('dailyBonus').where('uid','==',uid).get();
+    let lastTime = 0;
+    snap.forEach(doc=>{
+      const t = doc.data().timestamp;
+      const ms = t && t.toMillis ? t.toMillis() : 0;
+      if(ms > lastTime) lastTime = ms;
+    });
+    const hoursSince = (Date.now() - lastTime) / (1000*60*60);
+    if(lastTime && hoursSince < 24){
+      btn.disabled = true;
+      const remain = Math.ceil(24 - hoursSince);
+      statusEl.textContent = `Already claimed. Try again in ~${remain}h.`;
+    }else{
+      btn.disabled = false;
+      statusEl.textContent = 'Claim your free daily bonus!';
+    }
+  }catch(err){ console.error(err); }
+}
+
+document.getElementById('claimBonusBtn').onclick = async ()=>{
+  const btn = document.getElementById('claimBonusBtn');
+  btn.disabled = true;
+  try{
+    await db.collection('dailyBonus').add({
+      uid: currentUser.uid,
+      email: currentUserData.email,
+      amount: DAILY_BONUS_AMOUNT,
+      status: 'Pending',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    toast('Bonus request submitted! Admin will review shortly.', 'success');
+    refreshBonusButton();
+  }catch(err){
+    toast('Failed to claim bonus: ' + err.message, 'error');
+    btn.disabled = false;
+  }
+};
+
+document.getElementById('copyRefBtn').onclick = ()=>{
+  const input = document.getElementById('refLink');
+  input.select();
+  navigator.clipboard.writeText(input.value).then(()=> toast('Referral link copied!', 'success'));
+};
+
+document.getElementById('redeemPromoBtn').onclick = async ()=>{
+  const codeInput = document.getElementById('promoInput');
+  const code = codeInput.value.trim().toUpperCase();
+  if(!code){ toast('Please enter a promo code.', 'error'); return; }
+  try{
+    const q = await db.collection('promoCodes').where('code','==',code).limit(1).get();
+    if(q.empty){ toast('Invalid promo code.', 'error'); return; }
+    const promo = q.docs[0].data();
+    if(!promo.active){ toast('This promo code is no longer active.', 'error'); return; }
+
+    await db.collection('promoRedemptions').add({
+      uid: currentUser.uid,
+      email: currentUserData.email,
+      code: code,
+      amount: promo.amount,
+      status: 'Pending',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    toast('Promo code submitted for review!', 'success');
+    codeInput.value = '';
+  }catch(err){
+    toast('Error redeeming code: ' + err.message, 'error');
+  }
+};
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+/* ============ PAYMENTS VIEW ============ */
+let pendingWithdrawTotal = 0;
+function loadPaymentsView(){
+  const uid = currentUser.uid;
+
+  const unsubUser = db.collection('users').doc(uid).onSnapshot(snap=>{
+    if(!snap.exists) return;
+    updateAvailableBalance(snap.data().balance || 0);
+  });
+  unsubscribers.push(unsubUser);
+
+  const unsubW = db.collection('withdrawals').where('uid','==',uid).onSnapshot(snap=>{
+    let rows = [];
+    let pendingTotal = 0;
+    snap.forEach(doc=>{
+      const w = doc.data();
+      if(w.status === 'Pending') pendingTotal += Number(w.amount||0);
+      rows.push(w);
+    });
+    pendingWithdrawTotal = pendingTotal;
+    updateAvailableBalance(currentUserData ? currentUserData.balance : 0);
+
+    rows.sort((a,b)=>{
+      const ta = a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0;
+      const tb = b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0;
+      return tb - ta;
+    });
+
+    const body = document.getElementById('payoutHistoryBody');
+    if(rows.length === 0){
+      body.innerHTML = '<tr><td colspan="4" class="empty-note">No withdrawal requests yet.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map(w=>`
+      <tr>
+        <td>₹${fmtMoney(w.amount)}</td>
+        <td>${escapeHtml(w.paymentDetails)}</td>
+        <td><span class="badge ${w.status.toLowerCase()}">${w.status}</span></td>
+        <td>${fmtDate(w.timestamp)}</td>
+      </tr>
+    `).join('');
+  });
+  unsubscribers.push(unsubW);
+}
+
+function updateAvailableBalance(balance){
+  const avail = Math.max(0, Number(balance||0) - pendingWithdrawTotal);
+  document.getElementById('payAvailBalance').textContent = fmtMoney(avail);
+  document.getElementById('payPendingNote').textContent = pendingWithdrawTotal > 0
+    ? `₹${fmtMoney(pendingWithdrawTotal)} held in pending withdrawal requests`
+    : 'No pending withdrawals';
+}
+
+document.getElementById('withdrawForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('withdrawBtn');
+  const amount = Number(document.getElementById('withdrawAmount').value);
+  const upi = document.getElementById('withdrawUpi').value.trim();
+
+  if(amount < MIN_WITHDRAWAL){ toast(`Minimum withdrawal is ₹${MIN_WITHDRAWAL}.`, 'error'); return; }
+
+  btn.disabled = true; btn.textContent = 'SUBMITTING...';
+  try{
+    const snap = await db.collection('users').doc(currentUser.uid).get();
+    const balance = snap.data().balance || 0;
+    const available = balance - pendingWithdrawTotal;
+
+    if(amount > available){
+      toast(`Insufficient balance. Available: ₹${fmtMoney(available)}`, 'error');
+      btn.disabled = false; btn.textContent = 'REQUEST WITHDRAWAL';
+      return;
+    }
+
+    await db.collection('withdrawals').add({
+      uid: currentUser.uid,
+      email: currentUserData.email,
+      amount: amount,
+      paymentDetails: upi,
+      status: 'Pending',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    toast('Withdrawal request submitted!', 'success');
+    document.getElementById('withdrawForm').reset();
+  }catch(err){
+    toast('Error: ' + err.message, 'error');
+  }
+  btn.disabled = false; btn.textContent = 'REQUEST WITHDRAWAL';
+});
+
+/* ============ ADMIN PANEL ============ */
+let adminTabsBound = false;
+function initAdminPanel(){
+  if(!adminTabsBound){
+    adminTabsBound = true;
+    document.querySelectorAll('.admin-tab').forEach(tab=>{
+      tab.onclick = ()=>{
+        document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('.admin-sec').forEach(s=>s.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('admin-' + tab.dataset.admin).classList.add('active');
+      };
+    });
+  }
+
+  loadAdminOfferwalls();
+  loadAdminUsers();
+  loadAdminWithdrawals();
+  loadAdminBonus();
+  loadAdminPromoCodes();
+  loadAdminPromoRedemptions();
+  loadAdminReferrals();
+}
+
+// -- Offerwalls --
+document.getElementById('offerwallForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('owName').value.trim();
+  const url = document.getElementById('owUrl').value.trim();
+  const status = document.getElementById('owStatus').value;
+  try{
+    await db.collection('offerwalls').add({ name, url, status, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    toast('Offerwall added!', 'success');
+    document.getElementById('offerwallForm').reset();
+  }catch(err){ toast('Error: ' + err.message, 'error'); }
+});
+
+function loadAdminOfferwalls(){
+  const unsub = db.collection('offerwalls').onSnapshot(snap=>{
+    const body = document.getElementById('offerwallAdminBody');
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-note">No offerwalls yet.</td></tr>'; return; }
+    let rows = [];
+    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
+    body.innerHTML = rows.map(o=>`
+      <tr>
+        <td>${escapeHtml(o.name)}</td>
+        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(o.url)}</td>
+        <td><span class="badge ${o.status.toLowerCase()}">${o.status}</span></td>
+        <td>
+          <button class="mini-btn btn-ghost" onclick="toggleOfferwallStatus('${o.id}','${o.status}')">Toggle</button>
+          <button class="mini-btn btn-danger" onclick="deleteOfferwall('${o.id}')">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  });
+  unsubscribers.push(unsub);
+}
+window.toggleOfferwallStatus = async (id, currentStatus)=>{
+  const newStatus = currentStatus === 'Active' ? 'Disabled' : 'Active';
+  await db.collection('offerwalls').doc(id).update({ status: newStatus });
+  toast('Offerwall status updated.', 'success');
+};
+window.deleteOfferwall = async (id)=>{
+  if(!confirm('Delete this offerwall?')) return;
+  await db.collection('offerwalls').doc(id).delete();
+  toast('Offerwall deleted.', 'success');
+};
+
+// -- Users --
+function loadAdminUsers(){
+  const unsub = db.collection('users').onSnapshot(snap=>{
+    const body = document.getElementById('usersAdminBody');
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="6" class="empty-note">No users yet.</td></tr>'; return; }
+    let rows = [];
+    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
+    body.innerHTML = rows.map(u=>`
+      <tr>
+        <td>${escapeHtml(u.name)}</td>
+        <td>${escapeHtml(u.email)}</td>
+        <td>₹${fmtMoney(u.balance)}</td>
+        <td><span class="badge ${u.status==='blocked'?'blocked':'active'}">${u.status}</span></td>
+        <td>
+          <input type="number" class="mini-input" id="bal-${u.id}" placeholder="New ₹">
+          <button class="mini-btn btn-good" onclick="setUserBalance('${u.id}')">Set</button>
+        </td>
+        <td>
+          <button class="mini-btn ${u.status==='blocked'?'btn-good':'btn-danger'}" onclick="toggleUserBlock('${u.id}','${u.status}')">
+            ${u.status==='blocked' ? 'Unblock' : 'Block'}
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  });
+  unsubscribers.push(unsub);
+}
+window.setUserBalance = async (uid)=>{
+  const input = document.getElementById('bal-' + uid);
+  const val = Number(input.value);
+  if(isNaN(val) || val < 0){ toast('Enter a valid amount.', 'error'); return; }
+  await db.collection('users').doc(uid).update({ balance: val });
+  toast('Balance updated!', 'success');
+  input.value = '';
+};
+window.toggleUserBlock = async (uid, currentStatus)=>{
+  const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';
+  await db.collection('users').doc(uid).update({ status: newStatus });
+  toast('User status updated.', 'success');
+};
+
+// -- Withdrawals --
+function loadAdminWithdrawals(){
+  const unsub = db.collection('withdrawals').onSnapshot(snap=>{
+    const body = document.getElementById('withdrawalsAdminBody');
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="5" class="empty-note">No withdrawal requests.</td></tr>'; return; }
+    let rows = [];
+    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
+    rows.sort((a,b)=> statusOrder(a.status)-statusOrder(b.status));
+    body.innerHTML = rows.map(w=>`
+      <tr>
+        <td>${escapeHtml(w.email)}</td>
+        <td>₹${fmtMoney(w.amount)}</td>
+        <td>${escapeHtml(w.paymentDetails)}</td>
+        <td><span class="badge ${w.status.toLowerCase()}">${w.status}</span></td>
+        <td>
+          ${w.status === 'Pending' ? `
+            <button class="mini-btn btn-good" onclick="approveWithdrawal('${w.id}','${w.uid}',${w.amount})">Mark Paid</button>
+            <button class="mini-btn btn-danger" onclick="rejectWithdrawal('${w.id}')">Reject</button>
+          ` : '-'}
+        </td>
+      </tr>
+    `).join('');
+  });
+  unsubscribers.push(unsub);
+}
+function statusOrder(s){ return s === 'Pending' ? 0 : 1; }
+window.approveWithdrawal = async (id, uid, amount)=>{
+  if(!confirm('Confirm you have paid this user, and deduct ₹' + amount + ' from their balance?')) return;
+  try{
+    await db.runTransaction(async (tx)=>{
+      const userRef = db.collection('users').doc(uid);
+      const userSnap = await tx.get(userRef);
+      const bal = userSnap.data().balance || 0;
+      tx.update(userRef, { balance: bal - amount });
+      tx.update(db.collection('withdrawals').doc(id), { status: 'Paid' });
+    });
+    toast('Marked as paid, balance deducted.', 'success');
+  }catch(err){ toast('Error: ' + err.message, 'error'); }
+};
+window.rejectWithdrawal = async (id)=>{
+  await db.collection('withdrawals').doc(id).update({ status: 'Rejected' });
+  toast('Withdrawal rejected.', 'success');
+};
+
+// -- Daily Bonus --
+function loadAdminBonus(){
+  const unsub = db.collection('dailyBonus').onSnapshot(snap=>{
+    const body = document.getElementById('bonusAdminBody');
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-note">No bonus requests.</td></tr>'; return; }
+    let rows = [];
+    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
+    rows.sort((a,b)=> statusOrder(a.status)-statusOrder(b.status));
+    body.innerHTML = rows.map(b=>`
+      <tr>
+        <td>${escapeHtml(b.email)}</td>
+        <td>₹${fmtMoney(b.amount)}</td>
+        <td><span class="badge ${b.status.toLowerCase()}">${b.status}</span></td>
+        <td>
+          ${b.status === 'Pending' ? `
+            <button class="mini-btn btn-good" onclick="approveBonus('${b.id}','${b.uid}',${b.amount})">Approve</button>
+            <button class="mini-btn btn-danger" onclick="rejectBonus('${b.id}')">Reject</button>
+          ` : '-'}
+        </td>
+      </tr>
+    `).join('');
+  });
+  unsubscribers.push(unsub);
+}
+window.approveBonus = async (id, uid, amount)=>{
+  try{
+    await db.runTransaction(async (tx)=>{
+      const userRef = db.collection('users').doc(uid);
+      const userSnap = await tx.get(userRef);
+      const d = userSnap.data();
+      tx.update(userRef, { balance: (d.balance||0) + amount, totalEarned: (d.totalEarned||0) + amount });
+      tx.update(db.collection('dailyBonus').doc(id), { status: 'Approved' });
+    });
+    toast('Bonus approved & credited.', 'success');
+  }catch(err){ toast('Error: ' + err.message, 'error'); }
+};
+window.rejectBonus = async (id)=>{
+  await db.collection('dailyBonus').doc(id).update({ status: 'Rejected' });
+  toast('Bonus request rejected.', 'success');
+};
+
+// -- Promo Codes --
+document.getElementById('promoCodeForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const code = document.getElementById('promoCodeInput').value.trim().toUpperCase();
+  const amount = Number(document.getElementById('promoAmountInput').value);
+  try{
+    await db.collection('promoCodes').add({ code, amount, active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    toast('Promo code created!', 'success');
+    document.getElementById('promoCodeForm').reset();
+  }catch(err){ toast('Error: ' + err.message, 'error'); }
+});
+function loadAdminPromoCodes(){
+  const unsub = db.collection('promoCodes').onSnapshot(snap=>{
+    const body = document.getElementById('promoCodesAdminBody');
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-note">No promo codes yet.</td></tr>'; return; }
+    let rows = [];
+    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
+    body.innerHTML = rows.map(p=>`
+      <tr>
+        <td>${escapeHtml(p.code)}</td>
+        <td>₹${fmtMoney(p.amount)}</td>
+        <td><span class="badge ${p.active?'active':'disabled'}">${p.active?'Active':'Disabled'}</span></td>
+        <td>
+          <button class="mini-btn btn-ghost" onclick="togglePromoCode('${p.id}',${p.active})">Toggle</button>
+          <button class="mini-btn btn-danger" onclick="deletePromoCode('${p.id}')">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  });
+  unsubscribers.push(unsub);
+}
+window.togglePromoCode = async (id, active)=>{
+  await db.collection('promoCodes').doc(id).update({ active: !active });
+  toast('Promo code updated.', 'success');
+};
+window.deletePromoCode = async (id)=>{
+  if(!confirm('Delete this promo code?')) return;
+  await db.collection('promoCodes').doc(id).delete();
+  toast('Promo code deleted.', 'success');
+};
+
+function loadAdminPromoRedemptions(){
+  const unsub = db.collection('promoRedemptions').onSnapshot(snap=>{
+    const body = document.getElementById('promoRedeemAdminBody');
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="5" class="empty-note">No redemption requests.</td></tr>'; return; }
+    let rows = [];
+    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
+    rows.sort((a,b)=> statusOrder(a.status)-statusOrder(b.status));
+    body.innerHTML = rows.map(r=>`
+      <tr>
+        <td>${escapeHtml(r.email)}</td>
+        <td>${escapeHtml(r.code)}</td>
+        <td>₹${fmtMoney(r.amount)}</td>
+        <td><span class="badge ${r.status.toLowerCase()}">${r.status}</span></td>
+        <td>
+          ${r.status === 'Pending' ? `
+            <button class="mini-btn btn-good" onclick="approvePromoRedeem('${r.id}','${r.uid}',${r.amount})">Approve</button>
+            <button class="mini-btn btn-danger" onclick="rejectPromoRedeem('${r.id}')">Reject</button>
+          ` : '-'}
+        </td>
+      </tr>
+    `).join('');
+  });
+  unsubscribers.push(unsub);
+}
+window.approvePromoRedeem = async (id, uid, amount)=>{
+  try{
+    await db.runTransaction(async (tx)=>{
+      const userRef = db.collection('users').doc(uid);
+      const userSnap = await tx.get(userRef);
+      const d = userSnap.data();
+      tx.update(userRef, { balance: (d.balance||0) + amount, totalEarned: (d.totalEarned||0) + amount });
+      tx.update(db.collection('promoRedemptions').doc(id), { status: 'Approved' });
+    });
+    toast('Promo redemption approved & credited.', 'success');
+  }catch(err){ toast('Error: ' + err.message, 'error'); }
+};
+window.rejectPromoRedeem = async (id)=>{
+  await db.collection('promoRedemptions').doc(id).update({ status: 'Rejected' });
+  toast('Redemption rejected.', 'success');
+};
+
+// -- Referrals --
+function loadAdminReferrals(){
+  const unsub = db.collection('referrals').onSnapshot(snap=>{
+    const body = document.getElementById('referralsAdminBody');
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="5" class="empty-note">No referral requests.</td></tr>'; return; }
+    let rows = [];
+    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
+    rows.sort((a,b)=> statusOrder(a.status)-statusOrder(b.status));
+    body.innerHTML = rows.map(r=>`
+      <tr>
+        <td>${escapeHtml(r.referrerEmail)}</td>
+        <td>${escapeHtml(r.newUserEmail)}</td>
+        <td>₹${fmtMoney(r.bonusAmount)}</td>
+        <td><span class="badge ${r.status.toLowerCase()}">${r.status}</span></td>
+        <td>
+          ${r.status === 'Pending' ? `
+            <button class="mini-btn btn-good" onclick="approveReferral('${r.id}','${r.referrerUid}',${r.bonusAmount})">Approve</button>
+            <button class="mini-btn btn-danger" onclick="rejectReferral('${r.id}')">Reject</button>
+          ` : '-'}
+        </td>
+      </tr>
+    `).join('');
+  });
+  unsubscribers.push(unsub);
+}
+window.approveReferral = async (id, referrerUid, bonusAmount)=>{
+  try{
+    await db.runTransaction(async (tx)=>{
+      const userRef = db.collection('users').doc(referrerUid);
+      const userSnap = await tx.get(userRef);
+      const d = userSnap.data();
+      tx.update(userRef, { balance: (d.balance||0) + bonusAmount, totalEarned: (d.totalEarned||0) + bonusAmount });
+      tx.update(db.collection('referrals').doc(id), { status: 'Approved' });
+    });
+    toast('Referral approved & bonus credited.', 'success');
+  }catch(err){ toast('Error: ' + err.message, 'error'); }
+};
+window.rejectReferral = async (id)=>{
+  await db.collection('referrals').doc(id).update({ status: 'Rejected' });
+  toast('Referral rejected.', 'success');
+};
+
+/* ============ FOOTER LINKS (simple inline policy) ============ */
+document.getElementById('privacyLink').onclick = (e)=>{
+  e.preventDefault();
+  alert('India Empire Privacy Policy:\n\nWe collect your name, email, and activity data (offer completions, referrals, withdrawal requests) solely to operate the rewards program. We do not sell your data to third parties. Withdrawal details (UPI ID) are used only for processing payouts. Contact the admin for data deletion requests.');
+};
+document.getElementById('termsLink').onclick = (e)=>{
+  e.preventDefault();
+  alert('India Empire Terms of Service:\n\nRewards are credited after admin verification of completed offers, referrals, or promo code usage. India Empire reserves the right to review, approve, or reject any balance, bonus, or withdrawal request. Abuse of the referral or bonus system (fake accounts, fraud) will result in account suspension.');
+};
+</script>
+</body>
+</html>
