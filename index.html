@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>India Empire — Earn & Reward</title>
-<meta name="description" content="India Empire — complete offers and refer friends to earn rewards.">
+<meta name="description" content="India Empire — complete offers and earn rewards.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -160,12 +160,6 @@
   .row-input button{padding:11px 18px;border-radius:9px;border:none;font-weight:700;font-size:13px;
     background:linear-gradient(90deg,var(--cyan),#00c2ff);color:#04121a;white-space:nowrap;}
 
-  .ref-code-box{
-    display:flex;align-items:center;justify-content:space-between;background:var(--bg2);
-    border:1px dashed var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;
-  }
-  .ref-code-box code{font-size:16px;font-weight:700;color:var(--pink);letter-spacing:2px;}
-
   table{width:100%;border-collapse:collapse;font-size:13px;}
   th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--border);}
   th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;}
@@ -201,7 +195,7 @@
 <div id="authView" class="view hidden">
   <div class="auth-card">
     <div class="brand">INDIA EMPIRE</div>
-    <div class="tagline">EARN • REFER • REWARD</div>
+    <div class="tagline">EARN • REWARD</div>
     <div class="tabs">
       <button class="tab active" id="tabLogin">Login</button>
       <button class="tab" id="tabSignup">Signup</button>
@@ -219,7 +213,6 @@
       <div class="field"><label>FULL NAME</label><input type="text" id="signupName" required></div>
       <div class="field"><label>EMAIL</label><input type="email" id="signupEmail" required></div>
       <div class="field"><label>PASSWORD (min 6 characters)</label><input type="password" id="signupPassword" minlength="6" required></div>
-      <div class="field"><label>REFERRAL CODE (optional)</label><input type="text" id="signupReferral"></div>
       <button type="submit" class="btn-primary" id="signupBtn">CREATE ACCOUNT</button>
     </form>
   </div>
@@ -271,28 +264,6 @@
         <div class="empty-note">Loading offers...</div>
       </div>
 
-      <div class="section-title">👥 Refer & Earn</div>
-      <div class="card">
-        <div class="ref-code-box">
-          <span>Your Referral Code</span>
-          <code id="refCode">-</code>
-        </div>
-        <div class="row-input">
-          <input type="text" id="refLink" readonly>
-          <button id="copyRefBtn">COPY LINK</button>
-        </div>
-        <div class="balance-sub" style="margin-top:10px;">Referred friends: <b id="refCount" style="color:var(--cyan)">0</b> · Earn ₹10 per successful referral (approved by admin)</div>
-      </div>
-
-      <div class="section-title">🎁 Redeem Promo Code</div>
-      <div class="card">
-        <div class="row-input">
-          <input type="text" id="promoInput" placeholder="Enter promo code e.g. INDIA50">
-          <button id="redeemPromoBtn">REDEEM</button>
-        </div>
-        <div class="balance-sub" id="promoNote" style="margin-top:8px;">Approved codes credit your balance after admin review.</div>
-      </div>
-
       <div class="section-title">👤 My Profile</div>
       <div class="card" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
         <div id="profAvatar" style="width:64px;height:64px;border-radius:50%;flex-shrink:0;
@@ -316,8 +287,6 @@
       <div class="admin-tabs">
         <button class="admin-tab active" data-admin="offerwalls">Offerwalls</button>
         <button class="admin-tab" data-admin="users">Users</button>
-        <button class="admin-tab" data-admin="promocodes">Promo Codes</button>
-        <button class="admin-tab" data-admin="referrals">Referrals</button>
       </div>
 
       <!-- OFFERWALLS -->
@@ -356,43 +325,6 @@
         </div>
       </div>
 
-      <!-- PROMO CODES -->
-      <div class="admin-sec" id="admin-promocodes">
-        <div class="card" style="margin-bottom:20px;">
-          <h3>Create Promo Code</h3>
-          <form id="promoCodeForm">
-            <div class="grid grid-3">
-              <div class="field"><label>CODE</label><input type="text" id="promoCodeInput" required placeholder="INDIA50" style="text-transform:uppercase;"></div>
-              <div class="field"><label>AMOUNT (₹)</label><input type="number" id="promoAmountInput" required min="1"></div>
-              <div class="field"><label>&nbsp;</label><button type="submit" class="btn-primary">CREATE CODE</button></div>
-            </div>
-          </form>
-        </div>
-        <div class="card table-wrap">
-          <table>
-            <thead><tr><th>Code</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody id="promoCodesAdminBody"><tr><td colspan="4" class="empty-note">No promo codes yet.</td></tr></tbody>
-          </table>
-        </div>
-        <div class="section-title">Redemption Requests</div>
-        <div class="card table-wrap">
-          <table>
-            <thead><tr><th>Email</th><th>Code</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody id="promoRedeemAdminBody"><tr><td colspan="5" class="empty-note">No redemption requests.</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- REFERRALS -->
-      <div class="admin-sec" id="admin-referrals">
-        <div class="card table-wrap">
-          <table>
-            <thead><tr><th>Referrer</th><th>New User</th><th>Bonus</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody id="referralsAdminBody"><tr><td colspan="5" class="empty-note">No referral requests.</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -418,7 +350,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const ADMIN_EMAIL = "sa5332227@gmail.com";
-const REFERRAL_BONUS_AMOUNT = 10;
 
 let currentUser = null;
 let currentUserData = null;
@@ -445,13 +376,11 @@ function fmtDate(ts){
   const d = ts.toDate ? ts.toDate() : new Date(ts);
   return d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) + ' ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
 }
-function genReferralCode(uid){
-  return (uid.substring(0,6) + Math.random().toString(36).substring(2,4)).toUpperCase();
-}
 function clearListeners(){
   unsubscribers.forEach(u=>{ try{ u(); }catch(e){} });
   unsubscribers = [];
 }
+function sleep(ms){ return new Promise(res=> setTimeout(res, ms)); }
 
 /* ============ AUTH TABS ============ */
 document.getElementById('tabLogin').onclick = ()=>{
@@ -469,16 +398,6 @@ document.getElementById('tabSignup').onclick = ()=>{
   document.getElementById('authError').style.display='none';
 };
 
-// Prefill referral code from URL ?ref=CODE
-(function(){
-  const params = new URLSearchParams(window.location.search);
-  const ref = params.get('ref');
-  if(ref){
-    document.getElementById('signupReferral').value = ref.toUpperCase();
-    document.getElementById('tabSignup').click();
-  }
-})();
-
 function showAuthError(msg){
   const el = document.getElementById('authError');
   el.textContent = msg;
@@ -495,50 +414,25 @@ document.getElementById('signupForm').addEventListener('submit', async (e)=>{
   const name = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
-  const referralInput = document.getElementById('signupReferral').value.trim().toUpperCase();
 
   try{
     const cred = await auth.createUserWithEmailAndPassword(email, password);
     const uid = cred.user.uid;
     const role = (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ? 'admin' : 'user';
-    const referralCode = genReferralCode(uid);
 
-    let referredByCode = null;
-    let referrerDoc = null;
-    if(referralInput && role !== 'admin'){
-      const q = await db.collection('users').where('referralCode','==',referralInput).limit(1).get();
-      if(!q.empty){
-        referrerDoc = q.docs[0];
-        referredByCode = referralInput;
-      }
-    }
-
+    // Create the user's Firestore profile BEFORE anything else touches auth state.
     await db.collection('users').doc(uid).set({
       name: name,
       email: email,
       balance: 0,
       role: role,
       status: 'active',
-      referralCode: referralCode,
-      referredBy: referredByCode,
       totalEarned: 0,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    if(referrerDoc){
-      await db.collection('referrals').add({
-        referrerUid: referrerDoc.id,
-        referrerEmail: referrerDoc.data().email,
-        newUserUid: uid,
-        newUserEmail: email,
-        bonusAmount: REFERRAL_BONUS_AMOUNT,
-        status: 'Pending',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
-
     toast('Account created! Welcome to India Empire.', 'success');
-    // onAuthStateChanged will handle routing
+    // onAuthStateChanged will handle routing (it now waits/retries for this doc to exist)
   }catch(err){
     btn.disabled = false; btn.textContent = 'CREATE ACCOUNT';
     showAuthError(friendlyAuthError(err));
@@ -592,6 +486,20 @@ document.querySelectorAll('#userNavLinks button[data-view]').forEach(btn=>{
   };
 });
 
+/* ============ FETCH USER DOC WITH RETRY ============
+   Fixes the bug where a brand-new signup could get "Account data not found,
+   signing out" because onAuthStateChanged fired and read Firestore before
+   the profile document had finished being written. We now retry a few times
+   with a short delay before giving up. */
+async function fetchUserDocWithRetry(uid, attempts=8, delayMs=500){
+  for(let i=0;i<attempts;i++){
+    const docSnap = await db.collection('users').doc(uid).get();
+    if(docSnap.exists) return docSnap;
+    await sleep(delayMs);
+  }
+  return null;
+}
+
 /* ============ AUTH STATE ============ */
 auth.onAuthStateChanged(async (user)=>{
   document.getElementById('loadingScreen').classList.add('hidden');
@@ -606,9 +514,9 @@ auth.onAuthStateChanged(async (user)=>{
 
   currentUser = user;
   try{
-    const docSnap = await db.collection('users').doc(user.uid).get();
-    if(!docSnap.exists){
-      toast('Account data not found. Signing out.', 'error');
+    const docSnap = await fetchUserDocWithRetry(user.uid);
+    if(!docSnap){
+      toast('Account setup is taking longer than usual. Please try logging in again.', 'error');
       auth.signOut();
       return;
     }
@@ -653,8 +561,6 @@ function initDashboard(){
     document.getElementById('dashBalance').textContent = fmtMoney(d.balance);
     document.getElementById('dashTotalEarned').textContent = fmtMoney(d.totalEarned);
     document.getElementById('dashStatus').textContent = 'Account: ' + (d.status || 'active');
-    document.getElementById('refCode').textContent = d.referralCode || '-';
-    document.getElementById('refLink').value = window.location.origin + window.location.pathname + '?ref=' + (d.referralCode||'');
     document.getElementById('profName').textContent = d.name || '-';
     document.getElementById('profEmail').textContent = d.email || '-';
     document.getElementById('profJoined').textContent = fmtDate(d.createdAt);
@@ -688,44 +594,7 @@ function initDashboard(){
     });
   });
   unsubscribers.push(unsubOffers);
-
-  // Referral count
-  const unsubRefs = db.collection('referrals').where('referrerUid','==',uid).onSnapshot(snap=>{
-    document.getElementById('refCount').textContent = snap.size;
-  });
-  unsubscribers.push(unsubRefs);
 }
-
-document.getElementById('copyRefBtn').onclick = ()=>{
-  const input = document.getElementById('refLink');
-  input.select();
-  navigator.clipboard.writeText(input.value).then(()=> toast('Referral link copied!', 'success'));
-};
-
-document.getElementById('redeemPromoBtn').onclick = async ()=>{
-  const codeInput = document.getElementById('promoInput');
-  const code = codeInput.value.trim().toUpperCase();
-  if(!code){ toast('Please enter a promo code.', 'error'); return; }
-  try{
-    const q = await db.collection('promoCodes').where('code','==',code).limit(1).get();
-    if(q.empty){ toast('Invalid promo code.', 'error'); return; }
-    const promo = q.docs[0].data();
-    if(!promo.active){ toast('This promo code is no longer active.', 'error'); return; }
-
-    await db.collection('promoRedemptions').add({
-      uid: currentUser.uid,
-      email: currentUserData.email,
-      code: code,
-      amount: promo.amount,
-      status: 'Pending',
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    toast('Promo code submitted for review!', 'success');
-    codeInput.value = '';
-  }catch(err){
-    toast('Error redeeming code: ' + err.message, 'error');
-  }
-};
 
 function escapeHtml(str){
   const d = document.createElement('div');
@@ -750,9 +619,6 @@ function initAdminPanel(){
 
   loadAdminOfferwalls();
   loadAdminUsers();
-  loadAdminPromoCodes();
-  loadAdminPromoRedemptions();
-  loadAdminReferrals();
 }
 
 // -- Offerwalls --
@@ -840,140 +706,14 @@ window.toggleUserBlock = async (uid, currentStatus)=>{
   toast('User status updated.', 'success');
 };
 
-function statusOrder(s){ return s === 'Pending' ? 0 : 1; }
-
-// -- Promo Codes --
-document.getElementById('promoCodeForm').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const code = document.getElementById('promoCodeInput').value.trim().toUpperCase();
-  const amount = Number(document.getElementById('promoAmountInput').value);
-  try{
-    await db.collection('promoCodes').add({ code, amount, active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    toast('Promo code created!', 'success');
-    document.getElementById('promoCodeForm').reset();
-  }catch(err){ toast('Error: ' + err.message, 'error'); }
-});
-function loadAdminPromoCodes(){
-  const unsub = db.collection('promoCodes').onSnapshot(snap=>{
-    const body = document.getElementById('promoCodesAdminBody');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-note">No promo codes yet.</td></tr>'; return; }
-    let rows = [];
-    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
-    body.innerHTML = rows.map(p=>`
-      <tr>
-        <td>${escapeHtml(p.code)}</td>
-        <td>₹${fmtMoney(p.amount)}</td>
-        <td><span class="badge ${p.active?'active':'disabled'}">${p.active?'Active':'Disabled'}</span></td>
-        <td>
-          <button class="mini-btn btn-ghost" onclick="togglePromoCode('${p.id}',${p.active})">Toggle</button>
-          <button class="mini-btn btn-danger" onclick="deletePromoCode('${p.id}')">Delete</button>
-        </td>
-      </tr>
-    `).join('');
-  });
-  unsubscribers.push(unsub);
-}
-window.togglePromoCode = async (id, active)=>{
-  await db.collection('promoCodes').doc(id).update({ active: !active });
-  toast('Promo code updated.', 'success');
-};
-window.deletePromoCode = async (id)=>{
-  if(!confirm('Delete this promo code?')) return;
-  await db.collection('promoCodes').doc(id).delete();
-  toast('Promo code deleted.', 'success');
-};
-
-function loadAdminPromoRedemptions(){
-  const unsub = db.collection('promoRedemptions').onSnapshot(snap=>{
-    const body = document.getElementById('promoRedeemAdminBody');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="5" class="empty-note">No redemption requests.</td></tr>'; return; }
-    let rows = [];
-    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
-    rows.sort((a,b)=> statusOrder(a.status)-statusOrder(b.status));
-    body.innerHTML = rows.map(r=>`
-      <tr>
-        <td>${escapeHtml(r.email)}</td>
-        <td>${escapeHtml(r.code)}</td>
-        <td>₹${fmtMoney(r.amount)}</td>
-        <td><span class="badge ${r.status.toLowerCase()}">${r.status}</span></td>
-        <td>
-          ${r.status === 'Pending' ? `
-            <button class="mini-btn btn-good" onclick="approvePromoRedeem('${r.id}','${r.uid}',${r.amount})">Approve</button>
-            <button class="mini-btn btn-danger" onclick="rejectPromoRedeem('${r.id}')">Reject</button>
-          ` : '-'}
-        </td>
-      </tr>
-    `).join('');
-  });
-  unsubscribers.push(unsub);
-}
-window.approvePromoRedeem = async (id, uid, amount)=>{
-  try{
-    await db.runTransaction(async (tx)=>{
-      const userRef = db.collection('users').doc(uid);
-      const userSnap = await tx.get(userRef);
-      const d = userSnap.data();
-      tx.update(userRef, { balance: (d.balance||0) + amount, totalEarned: (d.totalEarned||0) + amount });
-      tx.update(db.collection('promoRedemptions').doc(id), { status: 'Approved' });
-    });
-    toast('Promo redemption approved & credited.', 'success');
-  }catch(err){ toast('Error: ' + err.message, 'error'); }
-};
-window.rejectPromoRedeem = async (id)=>{
-  await db.collection('promoRedemptions').doc(id).update({ status: 'Rejected' });
-  toast('Redemption rejected.', 'success');
-};
-
-// -- Referrals --
-function loadAdminReferrals(){
-  const unsub = db.collection('referrals').onSnapshot(snap=>{
-    const body = document.getElementById('referralsAdminBody');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="5" class="empty-note">No referral requests.</td></tr>'; return; }
-    let rows = [];
-    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
-    rows.sort((a,b)=> statusOrder(a.status)-statusOrder(b.status));
-    body.innerHTML = rows.map(r=>`
-      <tr>
-        <td>${escapeHtml(r.referrerEmail)}</td>
-        <td>${escapeHtml(r.newUserEmail)}</td>
-        <td>₹${fmtMoney(r.bonusAmount)}</td>
-        <td><span class="badge ${r.status.toLowerCase()}">${r.status}</span></td>
-        <td>
-          ${r.status === 'Pending' ? `
-            <button class="mini-btn btn-good" onclick="approveReferral('${r.id}','${r.referrerUid}',${r.bonusAmount})">Approve</button>
-            <button class="mini-btn btn-danger" onclick="rejectReferral('${r.id}')">Reject</button>
-          ` : '-'}
-        </td>
-      </tr>
-    `).join('');
-  });
-  unsubscribers.push(unsub);
-}
-window.approveReferral = async (id, referrerUid, bonusAmount)=>{
-  try{
-    await db.runTransaction(async (tx)=>{
-      const userRef = db.collection('users').doc(referrerUid);
-      const userSnap = await tx.get(userRef);
-      const d = userSnap.data();
-      tx.update(userRef, { balance: (d.balance||0) + bonusAmount, totalEarned: (d.totalEarned||0) + bonusAmount });
-      tx.update(db.collection('referrals').doc(id), { status: 'Approved' });
-    });
-    toast('Referral approved & bonus credited.', 'success');
-  }catch(err){ toast('Error: ' + err.message, 'error'); }
-};
-window.rejectReferral = async (id)=>{
-  await db.collection('referrals').doc(id).update({ status: 'Rejected' });
-  toast('Referral rejected.', 'success');
-};
-
 /* ============ FOOTER LINKS (simple inline policy) ============ */
 document.getElementById('privacyLink').onclick = (e)=>{
   e.preventDefault();
-  alert('India Empire Privacy Policy:\n\nWe collect your name, email, and activity data (offer completions, referrals, promo redemptions) solely to operate the rewards program. We do not sell your data to third parties. Contact the admin for data deletion requests.');
+  alert('India Empire Privacy Policy:\n\nWe collect your name, email, and activity data (offer completions) solely to operate the rewards program. We do not sell your data to third parties. Contact the admin for data deletion requests.');
 };
 document.getElementById('termsLink').onclick = (e)=>{
   e.preventDefault();
-  alert('India Empire Terms of Service:\n\nRewards are credited after admin verification of completed offers, referrals, or promo code usage. India Empire reserves the right to review, approve, or reject any balance or bonus credit. Abuse of the referral or bonus system (fake accounts, fraud) will result in account suspension.');
+  alert('India Empire Terms of Service:\n\nRewards are credited after admin verification of completed offers. India Empire reserves the right to review, approve, or reject any balance credit. Abuse of the bonus system (fake accounts, fraud) will result in account suspension.');
 };
 </script>
 </body>
