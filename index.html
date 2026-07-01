@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>India Empire — Earn & Reward</title>
-<meta name="description" content="India Empire — complete offers, refer friends, and withdraw your earnings.">
+<meta name="description" content="India Empire — complete offers and refer friends to earn rewards.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -201,7 +201,7 @@
 <div id="authView" class="view hidden">
   <div class="auth-card">
     <div class="brand">INDIA EMPIRE</div>
-    <div class="tagline">EARN • REFER • WITHDRAW</div>
+    <div class="tagline">EARN • REFER • REWARD</div>
     <div class="tabs">
       <button class="tab active" id="tabLogin">Login</button>
       <button class="tab" id="tabSignup">Signup</button>
@@ -231,7 +231,6 @@
     <div class="logo">INDIA EMPIRE</div>
     <div class="navLinks" id="userNavLinks">
       <button data-view="dashboard" class="active">Dashboard</button>
-      <button data-view="payments">Payments</button>
       <button id="logoutBtn">Logout</button>
     </div>
     <div class="navLinks hidden" id="adminNavLinks">
@@ -256,14 +255,10 @@
         </div>
       </div>
 
-      <div class="grid grid-3" style="margin-top:18px;">
+      <div class="grid grid-2" style="margin-top:18px;">
         <div class="card" style="text-align:center;">
           <h3>Total Members</h3>
           <div class="balance-amt" style="font-size:28px;color:var(--text)"><span id="statMembers">0</span></div>
-        </div>
-        <div class="card" style="text-align:center;">
-          <h3>Paid Withdrawals</h3>
-          <div class="balance-amt" style="font-size:28px;color:var(--good)"><span id="statPaid">0</span></div>
         </div>
         <div class="card" style="text-align:center;">
           <h3>Active Offers</h3>
@@ -315,42 +310,12 @@
     </div>
   </div>
 
-  <!-- PAYMENTS VIEW -->
-  <div id="paymentsView" class="view hidden">
-    <div class="container">
-      <div class="grid grid-2">
-        <div class="card">
-          <h3>Available Balance</h3>
-          <div class="balance-amt">₹<span id="payAvailBalance">0.00</span></div>
-          <div class="balance-sub" id="payPendingNote"></div>
-        </div>
-        <div class="card">
-          <h3>Withdraw Funds</h3>
-          <form id="withdrawForm">
-            <div class="field"><label>AMOUNT (min ₹50)</label><input type="number" id="withdrawAmount" min="50" step="1" required></div>
-            <div class="field"><label>UPI ID / PAYMENT DETAILS</label><input type="text" id="withdrawUpi" required placeholder="yourname@upi"></div>
-            <button type="submit" class="btn-primary" id="withdrawBtn">REQUEST WITHDRAWAL</button>
-          </form>
-        </div>
-      </div>
-
-      <div class="section-title">📜 Payout History</div>
-      <div class="card table-wrap">
-        <table>
-          <thead><tr><th>Amount</th><th>UPI</th><th>Status</th><th>Date</th></tr></thead>
-          <tbody id="payoutHistoryBody"><tr><td colspan="4" class="empty-note">No withdrawal requests yet.</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
   <!-- ADMIN VIEW -->
   <div id="adminView" class="view hidden">
     <div class="container">
       <div class="admin-tabs">
         <button class="admin-tab active" data-admin="offerwalls">Offerwalls</button>
         <button class="admin-tab" data-admin="users">Users</button>
-        <button class="admin-tab" data-admin="withdrawals">Withdrawals</button>
         <button class="admin-tab" data-admin="promocodes">Promo Codes</button>
         <button class="admin-tab" data-admin="referrals">Referrals</button>
       </div>
@@ -387,16 +352,6 @@
           <table>
             <thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Status</th><th>Set Balance</th><th>Block</th></tr></thead>
             <tbody id="usersAdminBody"><tr><td colspan="6" class="empty-note">Loading users...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- WITHDRAWALS -->
-      <div class="admin-sec" id="admin-withdrawals">
-        <div class="card table-wrap">
-          <table>
-            <thead><tr><th>Email</th><th>Amount</th><th>UPI</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody id="withdrawalsAdminBody"><tr><td colspan="5" class="empty-note">No withdrawal requests.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -464,7 +419,6 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const ADMIN_EMAIL = "sa5332227@gmail.com";
 const REFERRAL_BONUS_AMOUNT = 10;
-const MIN_WITHDRAWAL = 50;
 
 let currentUser = null;
 let currentUserData = null;
@@ -635,7 +589,6 @@ document.querySelectorAll('#userNavLinks button[data-view]').forEach(btn=>{
     document.querySelectorAll('#userNavLinks button').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     showView(btn.dataset.view + 'View');
-    if(btn.dataset.view === 'payments') loadPaymentsView();
   };
 });
 
@@ -716,12 +669,6 @@ function initDashboard(){
   });
   unsubscribers.push(unsubMembers);
 
-  // Live stats: paid withdrawals count
-  const unsubPaid = db.collection('withdrawals').where('status','==','Paid').onSnapshot(snap=>{
-    document.getElementById('statPaid').textContent = snap.size;
-  });
-  unsubscribers.push(unsubPaid);
-
   // Offerwalls
   const unsubOffers = db.collection('offerwalls').where('status','==','Active').onSnapshot(snap=>{
     document.getElementById('statOffers').textContent = snap.size;
@@ -786,96 +733,6 @@ function escapeHtml(str){
   return d.innerHTML;
 }
 
-/* ============ PAYMENTS VIEW ============ */
-let pendingWithdrawTotal = 0;
-function loadPaymentsView(){
-  const uid = currentUser.uid;
-
-  const unsubUser = db.collection('users').doc(uid).onSnapshot(snap=>{
-    if(!snap.exists) return;
-    updateAvailableBalance(snap.data().balance || 0);
-  });
-  unsubscribers.push(unsubUser);
-
-  const unsubW = db.collection('withdrawals').where('uid','==',uid).onSnapshot(snap=>{
-    let rows = [];
-    let pendingTotal = 0;
-    snap.forEach(doc=>{
-      const w = doc.data();
-      if(w.status === 'Pending') pendingTotal += Number(w.amount||0);
-      rows.push(w);
-    });
-    pendingWithdrawTotal = pendingTotal;
-    updateAvailableBalance(currentUserData ? currentUserData.balance : 0);
-
-    rows.sort((a,b)=>{
-      const ta = a.timestamp && a.timestamp.toMillis ? a.timestamp.toMillis() : 0;
-      const tb = b.timestamp && b.timestamp.toMillis ? b.timestamp.toMillis() : 0;
-      return tb - ta;
-    });
-
-    const body = document.getElementById('payoutHistoryBody');
-    if(rows.length === 0){
-      body.innerHTML = '<tr><td colspan="4" class="empty-note">No withdrawal requests yet.</td></tr>';
-      return;
-    }
-    body.innerHTML = rows.map(w=>`
-      <tr>
-        <td>₹${fmtMoney(w.amount)}</td>
-        <td>${escapeHtml(w.paymentDetails)}</td>
-        <td><span class="badge ${w.status.toLowerCase()}">${w.status}</span></td>
-        <td>${fmtDate(w.timestamp)}</td>
-      </tr>
-    `).join('');
-  });
-  unsubscribers.push(unsubW);
-}
-
-function updateAvailableBalance(balance){
-  const avail = Math.max(0, Number(balance||0) - pendingWithdrawTotal);
-  document.getElementById('payAvailBalance').textContent = fmtMoney(avail);
-  document.getElementById('payPendingNote').textContent = pendingWithdrawTotal > 0
-    ? `₹${fmtMoney(pendingWithdrawTotal)} held in pending withdrawal requests`
-    : 'No pending withdrawals';
-}
-
-document.getElementById('withdrawForm').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const btn = document.getElementById('withdrawBtn');
-  const amount = Number(document.getElementById('withdrawAmount').value);
-  const upi = document.getElementById('withdrawUpi').value.trim();
-
-  if(amount < MIN_WITHDRAWAL){ toast(`Minimum withdrawal is ₹${MIN_WITHDRAWAL}.`, 'error'); return; }
-
-  btn.disabled = true; btn.textContent = 'SUBMITTING...';
-  try{
-    const snap = await db.collection('users').doc(currentUser.uid).get();
-    const balance = snap.data().balance || 0;
-    const available = balance - pendingWithdrawTotal;
-
-    if(amount > available){
-      toast(`Insufficient balance. Available: ₹${fmtMoney(available)}`, 'error');
-      btn.disabled = false; btn.textContent = 'REQUEST WITHDRAWAL';
-      return;
-    }
-
-    await db.collection('withdrawals').add({
-      uid: currentUser.uid,
-      email: currentUserData.email,
-      amount: amount,
-      paymentDetails: upi,
-      status: 'Pending',
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    toast('Withdrawal request submitted!', 'success');
-    document.getElementById('withdrawForm').reset();
-  }catch(err){
-    toast('Error: ' + err.message, 'error');
-  }
-  btn.disabled = false; btn.textContent = 'REQUEST WITHDRAWAL';
-});
-
 /* ============ ADMIN PANEL ============ */
 let adminTabsBound = false;
 function initAdminPanel(){
@@ -893,7 +750,6 @@ function initAdminPanel(){
 
   loadAdminOfferwalls();
   loadAdminUsers();
-  loadAdminWithdrawals();
   loadAdminPromoCodes();
   loadAdminPromoRedemptions();
   loadAdminReferrals();
@@ -984,49 +840,7 @@ window.toggleUserBlock = async (uid, currentStatus)=>{
   toast('User status updated.', 'success');
 };
 
-// -- Withdrawals --
-function loadAdminWithdrawals(){
-  const unsub = db.collection('withdrawals').onSnapshot(snap=>{
-    const body = document.getElementById('withdrawalsAdminBody');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="5" class="empty-note">No withdrawal requests.</td></tr>'; return; }
-    let rows = [];
-    snap.forEach(doc=> rows.push({id:doc.id, ...doc.data()}));
-    rows.sort((a,b)=> statusOrder(a.status)-statusOrder(b.status));
-    body.innerHTML = rows.map(w=>`
-      <tr>
-        <td>${escapeHtml(w.email)}</td>
-        <td>₹${fmtMoney(w.amount)}</td>
-        <td>${escapeHtml(w.paymentDetails)}</td>
-        <td><span class="badge ${w.status.toLowerCase()}">${w.status}</span></td>
-        <td>
-          ${w.status === 'Pending' ? `
-            <button class="mini-btn btn-good" onclick="approveWithdrawal('${w.id}','${w.uid}',${w.amount})">Mark Paid</button>
-            <button class="mini-btn btn-danger" onclick="rejectWithdrawal('${w.id}')">Reject</button>
-          ` : '-'}
-        </td>
-      </tr>
-    `).join('');
-  });
-  unsubscribers.push(unsub);
-}
 function statusOrder(s){ return s === 'Pending' ? 0 : 1; }
-window.approveWithdrawal = async (id, uid, amount)=>{
-  if(!confirm('Confirm you have paid this user, and deduct ₹' + amount + ' from their balance?')) return;
-  try{
-    await db.runTransaction(async (tx)=>{
-      const userRef = db.collection('users').doc(uid);
-      const userSnap = await tx.get(userRef);
-      const bal = userSnap.data().balance || 0;
-      tx.update(userRef, { balance: bal - amount });
-      tx.update(db.collection('withdrawals').doc(id), { status: 'Paid' });
-    });
-    toast('Marked as paid, balance deducted.', 'success');
-  }catch(err){ toast('Error: ' + err.message, 'error'); }
-};
-window.rejectWithdrawal = async (id)=>{
-  await db.collection('withdrawals').doc(id).update({ status: 'Rejected' });
-  toast('Withdrawal rejected.', 'success');
-};
 
 // -- Promo Codes --
 document.getElementById('promoCodeForm').addEventListener('submit', async (e)=>{
@@ -1155,11 +969,11 @@ window.rejectReferral = async (id)=>{
 /* ============ FOOTER LINKS (simple inline policy) ============ */
 document.getElementById('privacyLink').onclick = (e)=>{
   e.preventDefault();
-  alert('India Empire Privacy Policy:\n\nWe collect your name, email, and activity data (offer completions, referrals, withdrawal requests) solely to operate the rewards program. We do not sell your data to third parties. Withdrawal details (UPI ID) are used only for processing payouts. Contact the admin for data deletion requests.');
+  alert('India Empire Privacy Policy:\n\nWe collect your name, email, and activity data (offer completions, referrals, promo redemptions) solely to operate the rewards program. We do not sell your data to third parties. Contact the admin for data deletion requests.');
 };
 document.getElementById('termsLink').onclick = (e)=>{
   e.preventDefault();
-  alert('India Empire Terms of Service:\n\nRewards are credited after admin verification of completed offers, referrals, or promo code usage. India Empire reserves the right to review, approve, or reject any balance, bonus, or withdrawal request. Abuse of the referral or bonus system (fake accounts, fraud) will result in account suspension.');
+  alert('India Empire Terms of Service:\n\nRewards are credited after admin verification of completed offers, referrals, or promo code usage. India Empire reserves the right to review, approve, or reject any balance or bonus credit. Abuse of the referral or bonus system (fake accounts, fraud) will result in account suspension.');
 };
 </script>
 </body>
